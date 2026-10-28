@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"$CLAUDE_PROJECT_DIR/.claude/hooks/on-edit.ps1\"",
+            "timeout": 300,
+            "statusMessage": "מעדכן מסמכים ומריץ בדיקות…"
+          }
+        ]
+      }
+    ]
+  }
+}

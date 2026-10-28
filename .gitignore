@@ -1,0 +1,6 @@
+# Local zip snapshots made by the hook (tools/backup.ps1); Git history replaces them in the repository
+backups/
+# Temporary files of a test run
+tests/.generated/
+# Personal Claude Code settings
+.claude/settings.local.json

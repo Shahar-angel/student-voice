@@ -1,0 +1,13 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>קול הסטודנטים – בדיקות</title>
+<pre id="results">running</pre>
+<!-- Order matters: mocks first, then the real server code, then the page source, then the tests. -->
+<script src="harness.js"></script>
+<script src="gas-mock.js"></script>
+<script src=".generated/code.js"></script>
+<script src=".generated/index-html.js"></script>
+<script src=".generated/sender.js"></script>
+<script src="server.test.js"></script>
+<script src="ui.test.js"></script>
+<script>window.runAllTests();</script>

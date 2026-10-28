@@ -1,0 +1,44 @@
+# קול הסטודנטים — instructions for Claude Code
+
+Student feedback chat on Google Apps Script. `apps-script/` holds exactly the files in the Google project: `Code.gs` is the server (all permission checks live here), `Index.html` is the single-page UI (named `Index` in the project). Deployed from the Google account arcobalenochic@gmail.com, which is also the only system admin; data lives in a Google Sheet in that account. User-facing docs are in Hebrew under `docs/`.
+
+`apps-script-sender/` is a second Google project, "קול הסטודנטים - שולח המיילים האישי", deployed "Execute as: User accessing" so staff email goes out from the staff member's own Gmail and quota. It holds no data: it pulls that person's queued mail from the app's `doPost` (`MAIN_URL`) every 10 minutes and reports back. The app's side is `SENDER_URL`, `senderApi_`, the `Senders` and `Outbox` sheets. Keep `MAIN_URL` equal to `appUrl` in `config/deployment.json` (a static test checks it). Only sign-in codes, answers to anonymous requests and the owner's own mail go from the system account; a student must never cause any other mail from it (new-request alerts go from each staff member's own sender to themselves). Full spec: `docs/00-איפיון-המערכת.md`.
+
+Never use the URL parameter names `c` or `sid`: Apps Script reserves them and the web app fails to open. Links use `?course=` and `&view=`.
+
+Links people get are the three permanent ones, never one per course: `exec` (admin), `exec?view=student` and `exec?view=staff` (`studentHome_`/`staffHome_`). After sign-in each person is routed by email to their course, or picks from a list. Per-course links (`studentLink_`/`staffLink_`) appear only in emails and as an optional direct link; a link to a deleted course must fall back to the picker, never a dead end.
+
+## Planning
+- Before planning, ask the user questions until the requirements are clear.
+- Always plan first, then execute. Do not write code before the user approves the plan. This replaces the earlier "just do it" requests; once the plan is approved, carry it out end to end, including the deploy.
+- Use Opus 5.5 for planning and Sonnet 5.5 for execution: plan in the main session, and hand the code and test changes to Sonnet sub-agents (Agent tool, `model: "sonnet"`). Browser deploys and steps that need the user's approval stay in the main session.
+
+## Git and GitHub
+- The project lives in a public GitHub repository: https://github.com/Shahar-angel/student-voice. Never commit keys, tokens or personal data.
+- Every new feature is developed on its own new branch, never directly on main.
+- The live app is deployed only from `main`: merge the branch after the tests pass and the user approves, then redeploy (see Docs).
+- `backups/` (the hook's local zip snapshots) stays out of Git (`.gitignore`); Git history is the way back to an earlier version.
+
+## Testing
+After every implementation, run and report the actual results:
+- E2E tests on the full user flow
+- Regression tests, to confirm existing features still work
+- Edge cases (empty, missing, very long or invalid input)
+
+Run: `powershell -NoProfile -ExecutionPolicy Bypass -File tests\run-tests.ps1` (results in `tests/last-results.md`). Add a test for every new feature or fixed bug, in the matching group in `tests/server.test.js` or `tests/ui.test.js`.
+
+## Security
+- After every stage of execution, run a security review: injection, prompt injection, input validation, and secrets or API keys in code.
+- Never put the Claude API key in code or docs; it lives only in the Apps Script property `ANTHROPIC_API_KEY`.
+- Student text sent to Claude goes through `studentBlock_()`; render user text with `textContent`, never `innerHTML`.
+
+## Docs
+- When behavior, links, limits or setup steps change, update the matching file in `docs/` in the same change. The hook keeps the index in `README.md` and the log in `docs/שינויים.md` up to date on its own.
+- After changing anything in `apps-script/` or `apps-script-sender/`, the live app only changes after redeploying from `main` (see `docs/01-התקנה-ופריסה.md`, "עדכון קוד").
+
+## Hook
+`.claude/hooks/on-edit.ps1` runs after every Write/Edit:
+- any file → zips the whole project into `backups/` (`tools/backup.ps1`, skipped when nothing changed). Restore with `tools/restore-backup.ps1 -Name <zip>`; never delete snapshots marked `_קבוע`.
+- edited `docs/*.md` → rebuilds the docs index in `README.md` and logs the change in `docs/שינויים.md`.
+- edited `config/deployment.json`, `apps-script/Code.gs` or `tools/build-links.ps1` → rebuilds `קישורים.html` and the links block in `README.md` (never edit those by hand; the link format is read from `studentHome_`/`staffHome_` in Code.gs).
+- edited `apps-script/*`, `apps-script-sender/*` or `tests/*` → runs the test suite, logs the result, and returns the result plus a docs/security/redeploy reminder.

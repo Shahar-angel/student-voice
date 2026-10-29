@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>יומן פעולות - קול הסטודנטים</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#1d2330;--muted:#667085;--line:#e1e5ec;--accent:#2457c5;--bad:#b42318}
+@media (prefers-color-scheme:dark){:root{--bg:#12151c;--card:#1b2029;--text:#e6e9ef;--muted:#9aa4b5;--line:#2c3340;--accent:#7aa2ff;--bad:#ff8a80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,'Segoe UI',Arial,sans-serif}
+main{max-width:820px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.6rem;margin:0 0 4px}
+article{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0;overflow-wrap:anywhere}
+article.bad{color:var(--bad);border-color:var(--bad)}
+h2{font-size:1.2rem;margin:0}
+h3{font-size:.95rem;color:var(--muted);margin:14px 0 2px}
+p{margin:4px 0}ul{margin:4px 0;padding-inline-start:22px}
+.meta,.muted{color:var(--muted);font-size:.9rem}
+a{color:var(--accent)}
+details{margin-top:12px}summary{cursor:pointer;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>יומן פעולות</h1>
+<p class="muted">זיכרון משני של הפרויקט. נוצר אוטומטית מהקבצים ב-<code>יומן-פעולות/רשומות</code>, לא לערוך ידנית. החדש למעלה.</p>
+<article><h2>יומן פעולות ושמירה אוטומטית ל-GitHub</h2><p class="meta"><span>2026-10-29T08:31:07</span> · <a href="https://github.com/Shahar-angel/student-voice/commits/activity-log">ענף: activity-log</a></p><section><h3>מה ביקשו</h3><p>יומן פעולות ב-HTML כזיכרון משני לפרויקט, ו-hook שבסוף כל תור של Claude שומר ב-Git ודוחף ל-GitHub.</p></section><section><h3>מה נעשה</h3><ul><li>נוצרה התיקייה יומן-פעולות עם רשומות JSON, README ודף index.html שנבנה אוטומטית (tools/build-activity-log.ps1), עם הסרת תווים מסוכנים מכל ערך</li><li>נכתב hook עצירה (.claude/hooks/on-stop.ps1): משלים שדות ברשומות ממתינות, סורק סודות, שומר ודוחף את הענף הנוכחי</li><li>ב-main נשמר רק היומן; שינויי קוד ב-main לא נשמרים ומתקבלת אזהרה</li><li>כשהדחיפה נכשלת הקומיט נשאר במחשב ונדחף בהרצה הבאה</li><li>נוסף tests/activity-log.test.ps1 (24 בדיקות) ושולב ב-tests/run-tests.ps1 כקבוצה יומן פעולות</li><li>עודכנו CLAUDE.md, README.md ו-docs/01-התקנה-ופריסה.md</li></ul></section><section><h3>החלטות</h3><ul><li>סימון רשומה כמטופלת בשדה done_at ולא במספר הקומיט, כדי להימנע מ-amend וקומיט נוסף</li><li>הרשומה מקושרת לענף ב-GitHub ולא לקומיט מסוים</li><li>הרשמת ה-hook ב-.claude/settings.json נעשית בנפרד, אחרי בדיקה</li></ul></section><section><h3>בדיקות</h3><p>בדיקות E2E, מקרי קצה ואבטחה של ה-hook רצות מול מאגרי Git זמניים בלבד.</p><p>הורץ: 2026-10-29 08:30  &#183;  עברו: 167  &#183;  נכשלו: 0</p></section><section><h3>מה נשאר</h3><ul><li>לרשום את hook העצירה ב-.claude/settings.json</li><li>למזג ל-main אחרי אישור</li></ul></section><details><summary>קבצים ששונו (10)</summary><ul><li>.claude/settings.json</li><li>CLAUDE.md</li><li>README.md</li><li>docs/01-התקנה-ופריסה.md</li><li>docs/שינויים.md</li><li>tests/last-results.md</li><li>tests/run-tests.ps1</li><li>.claude/hooks/on-stop.ps1</li><li>tests/activity-log.test.ps1</li><li>tools/build-activity-log.ps1</li></ul></details></article>
+</main>
+</body>
+</html>

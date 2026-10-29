@@ -42,3 +42,13 @@ Run: `powershell -NoProfile -ExecutionPolicy Bypass -File tests\run-tests.ps1` (
 - edited `docs/*.md` → rebuilds the docs index in `README.md` and logs the change in `docs/שינויים.md`.
 - edited `config/deployment.json`, `apps-script/Code.gs` or `tools/build-links.ps1` → rebuilds `קישורים.html` and the links block in `README.md` (never edit those by hand; the link format is read from `studentHome_`/`staffHome_` in Code.gs).
 - edited `apps-script/*`, `apps-script-sender/*` or `tests/*` → runs the test suite, logs the result, and returns the result plus a docs/security/redeploy reminder.
+
+`.claude/hooks/on-stop.ps1` (Stop hook, runs at the end of every assistant turn; never blocks):
+- completes the pending entries in `יומן-פעולות/רשומות/` (adds `time`, `branch`, `files`, `testSummary`, `done_at`) and rebuilds `יומן-פעולות/index.html` (`tools/build-activity-log.ps1`; never edit it by hand).
+- scans what would be committed for secrets (API keys, tokens, private keys); on a hit it commits and pushes nothing and warns.
+- commits everything and pushes the current branch to `origin`. On `main` only `יומן-פעולות/` is committed; code changes belong on a feature branch. If the push fails, the commit stays local and the next run pushes it.
+- tested against throwaway repos by `tests/activity-log.test.ps1` (part of `run-tests.ps1`); never run the hook against the real repo to test it, use `ACTIVITY_LOG_ROOT`.
+
+## Activity log
+- At the end of every task write one entry JSON in `יומן-פעולות/רשומות/`, named `YYYY-MM-DD_HH-mm_<short-latin-slug>.json`. Fields: `title` (required), `request`, `done` (array), `decisions` (array), `tests`, `open` (array). The hook adds the automatic fields. The repository is public: no student emails, personal data, keys or tokens in entries.
+- At the start of a new session read the latest entries in `יומן-פעולות/רשומות/` (or `index.html`) as secondary memory, after `MEMORY.md`.

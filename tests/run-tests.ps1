@@ -69,7 +69,19 @@ foreach ($g in ($results | Group-Object group)) {
 $lines += "## סריקה סטטית ($(@($static | Where-Object ok).Count)/$($static.Count))"
 foreach ($s in $static) { $lines += $(if ($s.ok) { "- ✅ $($s.name)" } else { "- ❌ $($s.name)" }) }
 if (@($dynamicHtml).Count) { $dynamicHtml | ForEach-Object { $lines += "  - Index.html:$($_.LineNumber)" } }
+# 5. Activity log: the Stop hook and its builder (tests/activity-log.test.ps1, runs against throwaway git repos).
+[Console]::OutputEncoding = $utf8
+$alRaw = (& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $tests 'activity-log.test.ps1') 2>&1 | Out-String) -split "`r?`n"
+$al = @($alRaw | Where-Object { $_ -match '^(✅|❌) ' })
+$alOk = @($al | Where-Object { $_ -like '✅*' }).Count
+$alFail = @($al | Where-Object { $_ -like '❌*' }).Count
+if (-not $al.Count) { $alFail = 1; $al = @('❌ activity-log.test.ps1 produced no results') }
+$lines += ''
+$lines += "## יומן פעולות ($alOk/$($al.Count))"
+foreach ($a in $al) { $lines += "- $a" }
+$totalOk = @($results | Where-Object ok).Count + @($static | Where-Object ok).Count + $alOk
+$lines[2] = "הורץ: $(Get-Date -Format 'yyyy-MM-dd HH:mm')  ·  עברו: $totalOk  ·  נכשלו: $($failed.Count + $alFail)"
 $report = $lines -join "`n"
 [IO.File]::WriteAllText((Join-Path $tests 'last-results.md'), $report + "`n", $utf8)
 Write-Output $report
-if ($failed.Count) { exit 1 } else { exit 0 }
+if ($failed.Count -or $alFail) { exit 1 } else { exit 0 }

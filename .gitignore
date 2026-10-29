@@ -4,3 +4,7 @@ backups/
 tests/.generated/
 # Personal Claude Code settings
 .claude/settings.local.json
+
+# clasp project file and credentials (defense in depth; credentials live in the user profile)
+.clasp.json
+.clasprc.json

@@ -78,7 +78,9 @@ if ($rel -match '^(config/deployment\.json|apps-script/Code\.gs|tools/build-link
 if ($rel -match '^apps-script/(Code\.gs|Index\.html)$' -or $rel -match '^apps-script-sender/' -or ($rel -match '^tests/' -and $rel -notmatch '^tests/(\.generated/|last-results\.md)')) {
   $runner = Join-Path $root 'tests\run-tests.ps1'
   $ErrorActionPreference = 'Continue'
-  $out = & powershell -NoProfile -ExecutionPolicy Bypass -File $runner 2>&1 | Out-String
+  # The slow PowerShell groups run only when their own scripts change; CI and deploy-google.ps1 always run everything.
+  $quick = if ($rel -match '^tests/.*\.ps1$') { @() } else { @('-Quick') }
+  $out = & powershell -NoProfile -ExecutionPolicy Bypass -File $runner @quick 2>&1 | Out-String
   $code = $LASTEXITCODE
   $summary = ($out -split "`n" | Where-Object { $_ -match '^הורץ:' } | Select-Object -First 1)
   if (-not $summary) { $summary = 'הבדיקות לא הסתיימו' }

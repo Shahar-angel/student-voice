@@ -3,6 +3,7 @@
 #  - a secret scan of what would be committed runs first; on a hit nothing is committed or pushed
 #  - on main only יומן-פעולות/ is committed (code changes belong on a feature branch)
 #  - if the push fails (offline, auth) the commit stays local and is pushed by the next run
+#  - after a successful push of main that changed apps-script*/ files: tools/deploy-google.ps1 deploys them to Google (env DEPLOY_GOOGLE_SCRIPT overrides the script, for tests)
 # Never blocks Claude: always exit 0, reports through {"systemMessage": "..."} only when it did something or something went wrong.
 # Root: -Root, else env ACTIVITY_LOG_ROOT, else two levels above this script.
 param([string]$Root = '')
@@ -118,11 +119,30 @@ try {
   }
 
   # --- 7. push ---
+  # What upstream pointed at before the push: used to see whether code for Google is among the commits just pushed.
+  $oldUpstream = ''
+  if ($hasUpstream) { $oldUpstream = ((GitC rev-parse '@{u}') | Out-String).Trim() }
   $null = GitC push -u origin $branch --quiet
   if ($gitExit -ne 0) {
     $messages += 'השמירה נשמרה במחשב ותידחף בפעם הבאה'
   } else {
     $messages += "נשמר ונדחף ל-GitHub: $branch ($($staged.Count) קבצים)"
+    # --- 8. main: deploy the Google projects when apps-script*/ changed in what was just pushed ---
+    if ($branch -eq 'main' -and $oldUpstream -match '^[0-9a-f]{40}$') {
+      $pushedFiles = @(GitC diff --name-only "$oldUpstream..HEAD" | Where-Object { $_ -and "$_" -match '^apps-script(-sender)?/' })
+      if ($pushedFiles.Count) {
+        $deploy = $env:DEPLOY_GOOGLE_SCRIPT   # tests point this at a stub
+        if (-not $deploy) { $deploy = Join-Path $Root 'tools\deploy-google.ps1' }
+        if (Test-Path -LiteralPath $deploy) {
+          $dOut = (& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $deploy -Root $Root 2>&1 | ForEach-Object { "$_".Trim() } | Where-Object { $_ }) -join ' '
+          if ($LASTEXITCODE -ne 0) { $dOut = 'פריסה ל-Google נעצרה: ' + $dOut }
+          if ($dOut.Length -gt 600) { $dOut = $dOut.Substring(0, 600) }
+          $messages += $dOut
+        } else {
+          $messages += 'שונה קוד שנפרס ל-Google, אך סקריפט הפריסה לא נמצא.'
+        }
+      }
+    }
   }
   Out-Msg ($messages -join ' | ')
 } catch {

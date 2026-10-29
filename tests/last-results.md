@@ -1,6 +1,6 @@
 # תוצאות הבדיקות האחרונות
 
-הורץ: 2026-10-29 08:30  ·  עברו: 167  ·  נכשלו: 0
+הורץ: 2026-10-29 09:42  ·  עברו: 143  ·  נכשלו: 0  ·  מצב מהיר (בלי יומן פעולות וסנכרון Google)
 
 ## רגרסיה (39/39)
 - ✅ setup יוצר גיליונות, מנהל ומפתח סודי, וריצה חוזרת לא שוברת
@@ -155,28 +155,6 @@
 - ✅ apps-script-sender/Code.gs - MAIN_URL is the deployed app (config/deployment.json)
 - ✅ Index.html - innerHTML only with fixed markup
 
-## יומן פעולות (24/24)
-- ✅ E2E: branch pushed to origin
-- ✅ E2E: working tree clean after the run
-- ✅ E2E: success message names the branch
-- ✅ E2E: entry got done_at, branch and files
-- ✅ E2E: index.html shows the title
-- ✅ E2E: commit message has the title and co-author line
-- ✅ No changes: no output
-- ✅ No changes: nothing committed
-- ✅ main: only the log is in the commit
-- ✅ main: code change is still uncommitted
-- ✅ main: warning about code on main
-- ✅ Secret: nothing committed
-- ✅ Secret: warning names the file, not the secret
-- ✅ Secret: nothing left staged
-- ✅ Secret: nothing pushed
-- ✅ XSS: no raw script or img tag in index.html
-- ✅ XSS: escaped text is present
-- ✅ Bad JSON: index still built with the corrupt-entry notes
-- ✅ Bad JSON: the hook still committed
-- ✅ Long field: truncated to 4000 characters
-- ✅ Push failure: commit is kept
-- ✅ Push failure: warning says it will be pushed next time
-- ✅ Push recovery: a clean-tree run pushes the pending commit
-- ✅ stop_hook_active: no-op
+## יומן פעולות (0/0)
+
+## סנכרון Google (0/0)

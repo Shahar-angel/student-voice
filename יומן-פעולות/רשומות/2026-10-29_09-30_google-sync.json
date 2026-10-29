@@ -1,0 +1,42 @@
+{
+    "title":  "פריסה אוטומטית ל-Google עם clasp, בדיקות ב-GitHub Actions",
+    "request":  "להפסיק להדביק קוד ידנית בדפדפן: לפרוס את main לשני פרויקטי Apps Script אוטומטית ובבטחה",
+    "done":  [
+                 "tools/deploy-google.ps1: תנאי מוקדם (main נקי ומעודכן), בדיקות, בדיקת סטייה מול Google, דחיפה רק של פרויקט ששונה, גרסה חדשה על מזהה הפריסה הקיים, ואימות",
+                 "ה-hook של סוף התור מריץ את הפריסה אחרי דחיפה של main כשקוד ב-apps-script* השתנה (timeout 600)",
+                 "GitHub Actions: tests.yml עם הרשאת קריאה בלבד ובלי סודות, ותגית ב-README",
+                 "tests/google-sync.test.ps1 עם clasp מדומה, כקבוצה בתוך run-tests.ps1",
+                 "מזהי הפרויקטים והפריסות הועברו ל-config/deployment.json; .clasp.json ו-.clasprc.json נוספו ל-.gitignore",
+                 "עודכנו CLAUDE.md, docs/01 ו-docs/04"
+             ],
+    "decisions":  [
+                      "בפריסה ישנה (תיאור בלי main@hash) סטייה נבדקת מול HEAD ומול הקומיטים האחרונים שנגעו בפרויקט, כדי שפריסה ראשונה עם שינוי לא תיעצר סתם",
+                      "תיאור הפריסה עובר ניקוי תווים לפני שהוא מועבר ל-clasp.cmd",
+                      "קובץ השרת בגוגל נקרא קוד, והסקריפט ממפה אליו את Code.gs"
+                  ],
+    "tests":  "tests/google-sync.test.ps1 ו-run-tests.ps1",
+    "open":  [
+                 "הפריסה האמיתית הראשונה עדיין לא רצה; יש לאמת בה את הפלט של clasp create-version"
+             ],
+    "time":  "2026-10-29T09:43:07",
+    "branch":  "google-sync",
+    "files":  [
+                  ".claude/hooks/on-edit.ps1",
+                  ".claude/hooks/on-stop.ps1",
+                  ".claude/settings.json",
+                  ".gitignore",
+                  "CLAUDE.md",
+                  "README.md",
+                  "config/deployment.json",
+                  "docs/01-התקנה-ופריסה.md",
+                  "docs/04-בדיקות-ואבטחה.md",
+                  "docs/שינויים.md",
+                  "tests/last-results.md",
+                  "tests/run-tests.ps1",
+                  ".github/workflows/tests.yml",
+                  "tests/google-sync.test.ps1",
+                  "tools/deploy-google.ps1"
+              ],
+    "testSummary":  "הורץ: 2026-10-29 09:42  ·  עברו: 143  ·  נכשלו: 0  ·  מצב מהיר (בלי יומן פעולות וסנכרון Google)",
+    "done_at":  "2026-10-29T09:43:07"
+}

@@ -1,6 +1,8 @@
 ﻿# Runs every test (server, E2E, edge cases, security) against the real Code.gs and Index.html.
 # Usage:  powershell -NoProfile -ExecutionPolicy Bypass -File tests\run-tests.ps1
 # Exit code 0 = all passed, 1 = a test or the static security scan failed.
+# -Quick skips the slow PowerShell groups (activity log, Google sync); the edit hook uses it. CI and deploy-google.ps1 run everything.
+param([switch]$Quick)
 $ErrorActionPreference = 'Stop'
 $root  = Split-Path -Parent $PSScriptRoot
 $app   = Join-Path $root 'apps-script'   # exactly the files that live in the Google project
@@ -71,17 +73,26 @@ foreach ($s in $static) { $lines += $(if ($s.ok) { "- ✅ $($s.name)" } else { "
 if (@($dynamicHtml).Count) { $dynamicHtml | ForEach-Object { $lines += "  - Index.html:$($_.LineNumber)" } }
 # 5. Activity log: the Stop hook and its builder (tests/activity-log.test.ps1, runs against throwaway git repos).
 [Console]::OutputEncoding = $utf8
-$alRaw = (& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $tests 'activity-log.test.ps1') 2>&1 | Out-String) -split "`r?`n"
+$alRaw = if ($Quick) { @() } else { (& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $tests 'activity-log.test.ps1') 2>&1 | Out-String) -split "`r?`n" }
 $al = @($alRaw | Where-Object { $_ -match '^(✅|❌) ' })
 $alOk = @($al | Where-Object { $_ -like '✅*' }).Count
 $alFail = @($al | Where-Object { $_ -like '❌*' }).Count
-if (-not $al.Count) { $alFail = 1; $al = @('❌ activity-log.test.ps1 produced no results') }
+if (-not $al.Count -and -not $Quick) { $alFail = 1; $al = @('❌ activity-log.test.ps1 produced no results') }
 $lines += ''
 $lines += "## יומן פעולות ($alOk/$($al.Count))"
 foreach ($a in $al) { $lines += "- $a" }
-$totalOk = @($results | Where-Object ok).Count + @($static | Where-Object ok).Count + $alOk
-$lines[2] = "הורץ: $(Get-Date -Format 'yyyy-MM-dd HH:mm')  ·  עברו: $totalOk  ·  נכשלו: $($failed.Count + $alFail)"
+# 6. Google sync: tools/deploy-google.ps1 with a fake clasp, and the hook's deploy trigger (tests/google-sync.test.ps1).
+$gsRaw = if ($Quick) { @() } else { (& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $tests 'google-sync.test.ps1') 2>&1 | Out-String) -split "`r?`n" }
+$gs = @($gsRaw | Where-Object { $_ -match '^(✅|❌) ' })
+$gsOk = @($gs | Where-Object { $_ -like '✅*' }).Count
+$gsFail = @($gs | Where-Object { $_ -like '❌*' }).Count
+if (-not $gs.Count -and -not $Quick) { $gsFail = 1; $gs = @('❌ google-sync.test.ps1 produced no results') }
+$lines += ''
+$lines += "## סנכרון Google ($gsOk/$($gs.Count))"
+foreach ($a in $gs) { $lines += "- $a" }
+$totalOk = @($results | Where-Object ok).Count + @($static | Where-Object ok).Count + $alOk + $gsOk
+$lines[2] = "הורץ: $(Get-Date -Format 'yyyy-MM-dd HH:mm')  ·  עברו: $totalOk  ·  נכשלו: $($failed.Count + $alFail + $gsFail)" + $(if ($Quick) { '  ·  מצב מהיר (בלי יומן פעולות וסנכרון Google)' } else { '' })
 $report = $lines -join "`n"
 [IO.File]::WriteAllText((Join-Path $tests 'last-results.md'), $report + "`n", $utf8)
 Write-Output $report
-if ($failed.Count -or $alFail) { exit 1 } else { exit 0 }
+if ($failed.Count -or $alFail -or $gsFail) { exit 1 } else { exit 0 }

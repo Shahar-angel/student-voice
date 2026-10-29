@@ -1,0 +1,26 @@
+{
+    "title":  "מיזוג הסנכרון עם Google ל-main ובדיקה ראשונה מול Google",
+    "request":  "לסנכרן אוטומטית בין המחשב, GitHub ו-Google Apps Script, להריץ בדיקות בכל המקומות ולמזג.",
+    "done":  [
+                 "נבדק סנכרון ידני: הקוד בעורך של Google, במחשב וב-GitHub זהה בשני הפרויקטים (SHA)",
+                 "הותקנו Node.js ו-clasp בתיקיית המשתמש; clasp מחובר לחשבון של מנהל המערכת",
+                 "נוסף apps-script/appsscript.json כפי שהוא ב-Google",
+                 "נוסף מצב מהיר לבדיקות (-Quick, כ-17 שניות) להוק העריכה; GitHub והפריסה מריצים את כל הבדיקות",
+                 "google-sync מוזג ל-main; tools/deploy-google.ps1 רץ באמת מול Google: ללא שינוי, אין שינויים ידניים ב-Google"
+             ],
+    "decisions":  [
+                      "בפרויקט ב-Google קובץ השרת נקרא קוד; הפריסה שומרת על השם הזה",
+                      "גרסה בלי main@hash בתיאור (v20, v3) נבדקת מול 30 השמירות האחרונות"
+                  ],
+    "tests":  "219 עברו, 0 נכשלו במחשב; GitHub Actions עבר בענף וב-main.",
+    "open":  [
+                 "העלאה אמיתית ראשונה (clasp push ו-update-deployment) תיבדק בשינוי הקוד הבא"
+             ],
+    "time":  "2026-10-29T10:18:26",
+    "branch":  "main",
+    "files":  [
+                  "tests/last-results.md"
+              ],
+    "testSummary":  "הורץ: 2026-10-29 10:17  ·  עברו: 219  ·  נכשלו: 0",
+    "done_at":  "2026-10-29T10:18:26"
+}

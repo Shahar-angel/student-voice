@@ -1,0 +1,38 @@
+{
+    "title":  "יומן פעולות ושמירה אוטומטית ל-GitHub",
+    "request":  "יומן פעולות ב-HTML כזיכרון משני לפרויקט, ו-hook שבסוף כל תור של Claude שומר ב-Git ודוחף ל-GitHub.",
+    "done":  [
+                 "נוצרה התיקייה יומן-פעולות עם רשומות JSON, README ודף index.html שנבנה אוטומטית (tools/build-activity-log.ps1), עם הסרת תווים מסוכנים מכל ערך",
+                 "נכתב hook עצירה (.claude/hooks/on-stop.ps1): משלים שדות ברשומות ממתינות, סורק סודות, שומר ודוחף את הענף הנוכחי",
+                 "ב-main נשמר רק היומן; שינויי קוד ב-main לא נשמרים ומתקבלת אזהרה",
+                 "כשהדחיפה נכשלת הקומיט נשאר במחשב ונדחף בהרצה הבאה",
+                 "נוסף tests/activity-log.test.ps1 (24 בדיקות) ושולב ב-tests/run-tests.ps1 כקבוצה יומן פעולות",
+                 "עודכנו CLAUDE.md, README.md ו-docs/01-התקנה-ופריסה.md"
+             ],
+    "decisions":  [
+                      "סימון רשומה כמטופלת בשדה done_at ולא במספר הקומיט, כדי להימנע מ-amend וקומיט נוסף",
+                      "הרשומה מקושרת לענף ב-GitHub ולא לקומיט מסוים",
+                      "הרשמת ה-hook ב-.claude/settings.json נעשית בנפרד, אחרי בדיקה"
+                  ],
+    "tests":  "בדיקות E2E, מקרי קצה ואבטחה של ה-hook רצות מול מאגרי Git זמניים בלבד.",
+    "open":  [
+                 "לרשום את hook העצירה ב-.claude/settings.json",
+                 "למזג ל-main אחרי אישור"
+             ],
+    "time":  "2026-10-29T08:31:07",
+    "branch":  "activity-log",
+    "files":  [
+                  ".claude/settings.json",
+                  "CLAUDE.md",
+                  "README.md",
+                  "docs/01-התקנה-ופריסה.md",
+                  "docs/שינויים.md",
+                  "tests/last-results.md",
+                  "tests/run-tests.ps1",
+                  ".claude/hooks/on-stop.ps1",
+                  "tests/activity-log.test.ps1",
+                  "tools/build-activity-log.ps1"
+              ],
+    "testSummary":  "הורץ: 2026-10-29 08:30  ·  עברו: 167  ·  נכשלו: 0",
+    "done_at":  "2026-10-29T08:31:07"
+}
